@@ -38,7 +38,12 @@ endif ()
 
 add_subdirectory(thirdparty)
 
-include_directories(include)
+find_package(PCL REQUIRED)
+
+include_directories(
+  include
+  ${PCL_INCLUDE_DIRS}
+)
 
 add_definitions("-D SOPHUS_USE_BASIC_LOGGING")
 include_directories(thirdparty/Sophus)
@@ -60,4 +65,5 @@ target_link_libraries(trajlo PUBLIC
         imgui glm::glm
         PRIVATE tsl::robin_map
         TBB::tbb
+        ${PCL_LIBRARIES}
 )

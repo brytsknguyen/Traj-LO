@@ -1,7 +1,7 @@
 dataset:
   data_type: "bag_ouster"
   topic: "/os1_cloud_node1/points"
-  path: "/home/zx/Data/Disk2/NTU_VIRAL/eee_03/eee_03.bag"
+  path: "/media/tmn/mySataSSD1/DATASETS/NTU_VIRAL/eee_01/eee_01_mod.bag"
   save_pose: true
   pose_file_path: "estimated_pose.txt"
 

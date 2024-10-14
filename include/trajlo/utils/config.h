@@ -69,6 +69,13 @@ struct TrajConfig {
   int frame_num;
   int point_num;
   Sophus::SE3d T_vis_lidar;
+
+  // Initialization
+  Eigen::Vector3d ypr0;
+  Eigen::Vector3d xyz0;
+  
+  std::string priormap;
+  
 };
 }  // namespace traj
 

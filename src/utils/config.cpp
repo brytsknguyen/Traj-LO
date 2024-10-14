@@ -83,6 +83,13 @@ namespace traj {
             tmp[8],tmp[9],tmp[10],tmp[11],
             tmp[12],tmp[13],tmp[14],tmp[15];
         T_vis_lidar=Sophus::SE3d(M44_vis);
+
+        // Get the initialization
+        tmp = config["init"]["xyz0"].as<std::vector<double>>();
+        xyz0 << tmp[0], tmp[1], tmp[2];
+        tmp = config["init"]["ypr0"].as<std::vector<double>>();
+        ypr0 << tmp[0], tmp[1], tmp[2];
+        priormap = config["init"]["priormap"].as<std::string>();
     }
 
 }

@@ -1,0 +1,48 @@
+# the config file for Livox Lidar which message type is livox_ros_driver/CustomMsg.h
+# support Livox Mid-70, Horizon, Avia
+dataset:
+  data_type: "bag_livox"
+  topic: "/lidar_0/points_livox"
+  path: "/media/tmn/mySataSSD1/Experiments/gptr/cloud_avia_mid_dynamic_extrinsics.bag"
+  save_pose: true
+  pose_file_path: "lidar0_estimated_pose.txt"
+
+calibration:
+  time_offset: 0.0
+  T_body_lidar: [ 1.0,  0.0,  0.0, 0.0,
+                  0.0,  1.0,  0.0, 0.0,
+                  0.0,  0.0,  1.0, 0.0,
+                  0.0,  0.0,  0.0, 1.0 ]
+  T_body_gt: [ 1.0,  0.0,  0.0, 0.0,
+               0.0,  1.0,  0.0, 0.0,
+               0.0,  0.0,  1.0, 0.0,
+               0.0,  0.0,  0.0, 1.0 ]
+init:
+  xyz0: [ 0,  0,  0.7]
+  ypr0: [ 43, 48, 0  ]
+  priormap: "/media/tmn/mySataSSD1/Experiments/gptr/priormap.pcd"
+
+trajectory:
+  init_interval: 3e8
+  seg_interval: 44080000
+  seg_num: 20
+  kinematic_constrain: 10.0
+  init_pose_weight: 1e9
+  converge_thresh: 0.001
+  max_iterations: 25
+
+mapping:
+  ds_size: 0.1
+  voxel_size: 0.15
+  max_voxel_num: 20
+  planer_thresh: 0.5
+  max_range: 120
+  min_range: 0.25
+
+vis:
+  frame_num: 1
+  point_num: 5
+  T_vis_lidar: [ 1.0,  0.0,  0.0, 0.0,
+                 0.0,  1.0,  0.0, 0.0,
+                 0.0,  0.0,  1.0, 0.0,
+                 0.0,  0.0,  0.0, 1.0 ]

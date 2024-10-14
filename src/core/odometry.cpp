@@ -28,6 +28,18 @@ SOFTWARE.
 #include <fstream>
 #include <iomanip>
 
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <pcl/io/pcd_io.h>
+
+// using namespace pcl;
+
+typedef pcl::PointCloud<pcl::PointXYZI> CloudXYZI;
+typedef pcl::PointCloud<pcl::PointXYZI>::Ptr CloudXYZIPtr;
+
+#define yolo() printf("Hello line: %s:%d. \n", __FILE__ , __LINE__);
+#define yolos(...) printf("Hello line: %s:%d. ", __FILE__, __LINE__); printf(__VA_ARGS__); std::cout << std::endl;
+
 uint64_t getCurrTime() {
   return std::chrono::duration_cast<std::chrono::microseconds>(
              std::chrono::high_resolution_clock::now().time_since_epoch())
@@ -78,7 +90,8 @@ void TrajLOdometry::Start() {
       }
       PointCloudSegment(curr_scan, measure);
 
-      while (!measure_cache.empty()) {
+      while (!measure_cache.empty())
+      {
         measure = measure_cache.front();
         measure_cache.pop_front();
 
@@ -88,8 +101,30 @@ void TrajLOdometry::Start() {
 
         const auto& tp = measure->tp;
         if (!map_->IsInit()) {
-          T_wc_curr = Sophus::SE3d();
-          map_->MapInit(points);
+          // T_wc_curr = Sophus::SE3d();
+   
+          printf("Init pose: %f, %f, %f, %f, %f, %f\n", config_.xyz0(0), config_.xyz0(1), config_.xyz0(2), config_.ypr0(0), config_.ypr0(1), config_.ypr0(2));
+          Eigen::Vector3d p0 = config_.xyz0;
+          Eigen::Matrix3d R0 = (Eigen::AngleAxis(config_.ypr0(0)*M_PI/180, Eigen::Vector3d::UnitZ())
+                               *Eigen::AngleAxis(config_.ypr0(1)*M_PI/180, Eigen::Vector3d::UnitY())
+                               *Eigen::AngleAxis(config_.ypr0(2)*M_PI/180, Eigen::Vector3d::UnitX())
+                               ).toRotationMatrix();
+         
+          T_wc_curr = Sophus::SE3d(Sophus::SO3d(R0), p0);
+
+          // Load prior map
+          CloudXYZIPtr priormap(new CloudXYZI());
+          pcl::io::loadPCDFile<pcl::PointXYZI>(config_.priormap, *priormap);
+          printf("Prior map loaded. Points: %d\n", priormap->size());
+
+          std::vector<Eigen::Vector4d> points_;
+          for(auto &p : priormap->points)
+            points_.push_back(Eigen::Vector4d(p.x, p.y, p.z, 0));
+          printf("Prior map converted. Points: %d\n", points_.size());
+
+          map_->MapInit(points_);
+
+          // printf("Prior map Init. Points: %d\n", map_.size);
 
           // standing start
           frame_poses_[tp.second] =
@@ -189,77 +224,78 @@ void TrajLOdometry::Start() {
  * https://gitlab.com/VladyslavUsenko/basalt/-/issues/37
  * */
 void TrajLOdometry::Optimize() {
+yolo();
   AbsOrderMap aom;
   for (const auto& kv : frame_poses_) {
     aom.abs_order_map[kv.first] = std::make_pair(aom.total_size, POSE_SIZE);
     aom.total_size += POSE_SIZE;
     aom.items++;
   }
-
+yolo();
   Eigen::MatrixXd abs_H;
   Eigen::VectorXd abs_b;
-
+yolo();
   for (int iter = 0; iter < config_.max_iterations; iter++) {
     abs_H.setZero(aom.total_size, aom.total_size);
     abs_b.setZero(aom.total_size);
-
+yolo();
     // 两帧优化
     for (auto& m : measurements) {
       int64_t idx_prev = m.first.first;
       int64_t idx_curr = m.first.second;
-
+yolo();
       const auto& prev = frame_poses_[idx_prev];
       const auto& curr = frame_poses_[idx_curr];
-
+yolo();
       posePair pp{prev.getPose(), curr.getPose()};
       const tStampPair& tp = m.second->tp;  //{idx_prev,idx_curr};
-
+yolo();
       // 1. Geometric constrains from lidar point cloud.
       map_->PointRegistrationNormal({prev, curr}, tp, m.second->delta_H,
                                     m.second->delta_b, m.second->lastError,
                                     m.second->lastInliers);
-
+yolo();
       // 2. Motion constrains behind continuous movement.
       // Log(Tbe)-Log(prior) Equ.(6)
       {
         Sophus::SE3d T_be = pp.first.inverse() * pp.second;
         Sophus::Vector6d tau = Sophus::se3_logd(T_be);
         Sophus::Vector6d res = tau - Sophus::se3_logd(m.second->pseudoPrior);
-
+yolo();
         Sophus::Matrix6d J_T_w_b;
         Sophus::Matrix6d J_T_w_e;
         Sophus::Matrix6d rr_b;
         Sophus::Matrix6d rr_e;
-
+yolo();
         if (prev.isLinearized() || curr.isLinearized()) {
           pp = std::make_pair(prev.getPoseLin(), curr.getPoseLin());
           T_be = pp.first.inverse() * pp.second;
           tau = Sophus::se3_logd(T_be);
         }
-
+yolo();
         Sophus::rightJacobianInvSE3Decoupled(tau, J_T_w_e);
         J_T_w_b = -J_T_w_e * (T_be.inverse()).Adj();
-
+yolo();
         rr_b.setIdentity();
         rr_b.topLeftCorner<3, 3>() = pp.first.rotationMatrix().transpose();
         rr_e.setIdentity();
         rr_e.topLeftCorner<3, 3>() = pp.second.rotationMatrix().transpose();
-
+yolo();
         Eigen::Matrix<double, 6, 12> J_be;
         J_be.topLeftCorner<6, 6>() = J_T_w_b * rr_b;
         J_be.topRightCorner<6, 6>() = J_T_w_e * rr_e;
-
+yolo();
         double alpha_e = config_.kinematic_constrain * m.second->lastInliers;
         m.second->delta_H += alpha_e * J_be.transpose() * J_be;
         m.second->delta_b -= alpha_e * J_be.transpose() * res;
       }
-
+yolo();
       int abs_id = aom.abs_order_map.at(idx_prev).first;
       abs_H.block<POSE_SIZE * 2, POSE_SIZE * 2>(abs_id, abs_id) +=
           m.second->delta_H;
       abs_b.segment<POSE_SIZE * 2>(abs_id) += m.second->delta_b;
     }
-
+yolo();
     // Marginalization Error Term
     // reference: Square Root Marginalization for Sliding-Window Bundle
     // Adjustment (N Demmel, D Schubert, C Sommer, D Cremers and V Usenko)
@@ -273,18 +309,19 @@ void TrajLOdometry::Optimize() {
     abs_H.block<POSE_SIZE, POSE_SIZE>(0, 0) += marg_H;
     abs_b.head<POSE_SIZE>() -= marg_b;
     abs_b.head<POSE_SIZE>() -= (marg_H * delta);
-
+yolo();
     Eigen::VectorXd update = abs_H.ldlt().solve(abs_b);
     double max_inc = update.array().abs().maxCoeff();
-
+yolo();
     if (max_inc < converge_thresh_) {
       break;
     }
-
+yolo();
     for (auto& kv : frame_poses_) {
       int idx = aom.abs_order_map.at(kv.first).first;
       kv.second.applyInc(update.segment<POSE_SIZE>(idx));
     }
+yolo();
   }
 
   // update pseudo motion prior after each optimization
@@ -308,7 +345,8 @@ void TrajLOdometry::Marginalize() {
     const auto& tp = measurements.begin()->first;
     const posePair pp{frame_poses_[tp.first].getPose(),
                       frame_poses_[tp.second].getPose()};
-    map_->Update(pp, tp);
+    
+    // map_->Update(pp, tp);
 
     Eigen::VectorXd delta = frame_poses_[tp.first].getDelta();
 
