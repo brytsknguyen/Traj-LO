@@ -17,10 +17,11 @@ calibration:
                0.0,  1.0,  0.0, 0.0,
                0.0,  0.0,  1.0, 0.0,
                0.0,  0.0,  0.0, 1.0 ]
-init:
+gptr_exp:
   xyz0: [-0.3, -0.3, 0.55 ]
   ypr0: [-134,  0,    0   ]
   priormap: "/media/tmn/mySataSSD1/Experiments/gptr/priormap.pcd"
+  max_time: -1
 
 trajectory:
   init_interval: 3e8

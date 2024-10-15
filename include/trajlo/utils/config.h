@@ -74,7 +74,8 @@ struct TrajConfig {
   Eigen::Vector3d ypr0;
   Eigen::Vector3d xyz0;
   
-  std::string priormap;
+  std::string priormap = "";
+  double max_time = -1;
   
 };
 }  // namespace traj

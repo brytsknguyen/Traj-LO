@@ -17,27 +17,29 @@ calibration:
                0.0,  1.0,  0.0, 0.0,
                0.0,  0.0,  1.0, 0.0,
                0.0,  0.0,  0.0, 1.0 ]
-init:
+gptr_exp:
   xyz0: [ 49.27, 107.37, 7.62]
-  ypr0: [-41, 0, 0]
+  ypr0: [-41,    0,      0   ]
+  # priormap: ""
   priormap: "/media/tmn/mySataSSD1/Experiments/gptr/mcd_ntu_priormap_cropped.pcd"
+  max_time: 180
 
 trajectory:
   init_interval: 3e8
-  seg_interval: 44080000
+  seg_interval: 22040000
   seg_num: 20
-  kinematic_constrain: 10.0
+  kinematic_constrain: 1.0
   init_pose_weight: 1e9
   converge_thresh: 0.001
   max_iterations: 25
 
 mapping:
-  ds_size: 0.1
-  voxel_size: 0.15
+  ds_size: 0.4
+  voxel_size: 0.4
   max_voxel_num: 20
-  planer_thresh: 0.5
+  planer_thresh: 0.2
   max_range: 120
-  min_range: 0.25
+  min_range: 1
 
 vis:
   frame_num: 1

@@ -221,9 +221,11 @@ void Visualizer::drawPanel() {
   static int counter = 0;
 
   ImGui::Begin("Panel");
-  ImGui::Checkbox("Odometry", &show_odomerty_window);
+  // ImGui::Checkbox("Odometry", &show_odomerty_window);
 
-  if (show_odomerty_window) {
+  show_odomerty_window = true;
+  if (show_odomerty_window)
+  {
     static bool odometry_state = false;
     if (odometry_state) {
       ImGui::Text("Traj-LO is working now !!! ");
@@ -250,15 +252,18 @@ void Visualizer::drawPanel() {
     ImGui::Text("Select data source for odometry");
     ImGui::Checkbox("Dataset", &load_dataset);
 
-    if (dataset && load_dataset) {
-      if (ImGui::Button("Start")) {
+    // if (dataset && load_dataset)
+    // {
+      // if (ImGui::Button("Start"))
+      // {
         dataset->start();
-      }
-      ImGui::SameLine();
-      if (ImGui::Button("Stop")) {
-        dataset->stop();
-      }
-    }
+      // }
+
+      // ImGui::SameLine();
+      // if (ImGui::Button("Stop")) {
+      //   dataset->stop();
+      // }
+    // }
   }
   ImGui::NewLine();
   //  ImGui::Dummy({50.0f,50.0f});
