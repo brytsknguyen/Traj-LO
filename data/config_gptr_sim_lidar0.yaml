@@ -20,7 +20,7 @@ calibration:
 gptr_exp:
   xyz0: [ 0,  0,  0.7]
   ypr0: [ 43, 48, 0  ]
-  priormap: "/media/tmn/mySataSSD1/Experiments/gptr/priormap.pcd"
+  priormap: "/media/tmn/mySataSSD1/Experiments/gptr_v2/sequences/sim_priormap.pcd"
   max_time: -1
 
 trajectory:

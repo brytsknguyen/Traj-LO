@@ -223,13 +223,23 @@ void TrajLOdometry::Start() {
       std::ofstream os(config_.pose_file_path);
       os << "# timestamp tx ty tz qx qy qz qw" << std::endl;
 
+      Eigen::Vector3d p0 = config_.xyz0;
+      Eigen::Matrix3d R0 = (Eigen::AngleAxis(config_.ypr0(0)*M_PI/180, Eigen::Vector3d::UnitZ())
+                           *Eigen::AngleAxis(config_.ypr0(1)*M_PI/180, Eigen::Vector3d::UnitY())
+                           *Eigen::AngleAxis(config_.ypr0(2)*M_PI/180, Eigen::Vector3d::UnitX())
+                           ).toRotationMatrix();
+
+      // Find the transform for prior map to the initial position
+      Sophus::SE3d T_W_L0(R0, p0);
+
       for(const auto& p:trajectory_){
         Sophus::SE3d pose_body=config_.T_body_lidar*p.second*config_.T_body_lidar.inverse();
-        Sophus::SE3d pose_gt=pose_body*config_.T_body_gt;
+        Sophus::SE3d pose_gt=T_W_L0*pose_body*config_.T_body_gt;
 
         os << std::scientific << std::setprecision(18)
-           << p.first * 1e-9 << " " << pose_gt.translation().x()
-           << " " << pose_gt.translation().y() << " "
+           << p.first * 1e-9 << " " 
+           << pose_gt.translation().x() << " "
+           << pose_gt.translation().y() << " "
            << pose_gt.translation().z() << " "
            << pose_gt.so3().unit_quaternion().x() << " "
            << pose_gt.so3().unit_quaternion().y() << " "
@@ -238,6 +248,7 @@ void TrajLOdometry::Start() {
       }
       os.close();
       std::cout << "Finish Pose Saving!" << std::endl;
+      exit(0);
     }
 
     isFinish = true;
