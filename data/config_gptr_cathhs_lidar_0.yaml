@@ -2,10 +2,10 @@
 # support Livox Mid-70, Horizon, Avia
 dataset:
   data_type: "bag_livox"
-  topic: "/lidar_1/points_livox"
-  path: "/media/tmn/mySataSSD1/Experiments/gptr_v2/sequences/cloud_avia_mid_w25_dynxtrz_e5.bag"
+  topic: "/livox/lidar_192_168_10_110"
+  path: "/media/tmn/mySataSSD1/Experiments/gptr/cathhs/cathhs_07.bag"
   save_pose: true
-  pose_file_path: "lidar1_estimated_pose.txt"
+  pose_file_path: "cathhs_lidar0_estimated_pose.txt"
 
 calibration:
   time_offset: 0.0
@@ -18,23 +18,24 @@ calibration:
                0.0,  0.0,  1.0, 0.0,
                0.0,  0.0,  0.0, 1.0 ]
 gptr_exp:
-  xyz0: [-0.3, -0.3, 0.55 ]
-  ypr0: [-134,  0,    0   ]
-  priormap: "/media/tmn/mySataSSD1/Experiments/gptr_v2/sequences/sim_priormap.pcd"
+  xyz0: [ 0, 0, 0 ]
+  ypr0: [ 0, 0, 0 ]
+  priormap: "/media/tmn/mySataSSD1/Experiments/gptr/cathhs_iot_prior_2cm.pcd"
+  # priormap: ""
   max_time: -1
 
 trajectory:
-  init_interval: 3e8
-  seg_interval: 43570000
+  init_interval: 1e9
+  seg_interval: 22040000
   seg_num: 54
-  kinematic_constrain: 2.0
+  kinematic_constrain: 10.0
   init_pose_weight: 1e9
   converge_thresh: 0.001
   max_iterations: 50
 
 mapping:
   ds_size: 0.1
-  voxel_size: 0.15
+  voxel_size: 0.2
   max_voxel_num: 20
   planer_thresh: 0.5
   max_range: 120

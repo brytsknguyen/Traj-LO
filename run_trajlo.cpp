@@ -42,6 +42,21 @@ int main(int argc, char *argv[]) {
   traj::TrajConfig config;
   config.load(config_path);
 
+  std::string sequence = "";
+  std::string log_file = "";
+  printf("argc %d\n", argc);
+  if (argc == 4)
+  {
+    sequence = argv[2];
+    log_file = argv[3];
+
+    config.dataset_path = sequence;
+    config.pose_file_path = log_file;
+
+    printf("Sequence file overwritten: %s\n", config.dataset_path.c_str());
+    printf("log_file overwritten: %s\n", config.pose_file_path.c_str());
+  }
+
   traj::TrajLOdometry::Ptr trajLOdometry(new traj::TrajLOdometry(config));
   traj::DataLoader::Ptr dataLoader = nullptr;
   std::thread t_io;
@@ -49,8 +64,7 @@ int main(int argc, char *argv[]) {
   t_io = std::thread(&traj::DataLoader::publish, dataLoader,
                      config.dataset_path, config.topic);
 
-  traj::Visualizer::Ptr visualizer(
-      new traj::Visualizer(trajLOdometry, config, dataLoader));
+  traj::Visualizer::Ptr visualizer(new traj::Visualizer(trajLOdometry, config, dataLoader));
   std::cout << "Wait data input..............\n";
 
   { visualizer->mainLoop(); }

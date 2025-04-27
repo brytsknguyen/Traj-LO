@@ -3,7 +3,7 @@
 dataset:
   data_type: "bag_livox"
   topic: "/lidar_0/points_livox"
-  path: "/media/tmn/mySataSSD1/Experiments/gptr/cloud_avia_mid_dynamic_extrinsics.bag"
+  path: "/media/tmn/mySataSSD1/Experiments/gptr_v2/sequences/cloud_avia_mid_w25_dynxtrz_e5.bag"
   save_pose: true
   pose_file_path: "lidar0_estimated_pose.txt"
 
@@ -25,12 +25,12 @@ gptr_exp:
 
 trajectory:
   init_interval: 3e8
-  seg_interval: 44080000
-  seg_num: 20
-  kinematic_constrain: 10.0
+  seg_interval: 43570000
+  seg_num: 54
+  kinematic_constrain: 2.0
   init_pose_weight: 1e9
   converge_thresh: 0.001
-  max_iterations: 25
+  max_iterations: 50
 
 mapping:
   ds_size: 0.1

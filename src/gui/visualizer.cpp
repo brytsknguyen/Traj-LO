@@ -37,8 +37,7 @@ bool Visualizer::windowInit() {
   // setting forward-compatible core profile context (necessary for macos)
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-  GLFWmonitor* MyMonitor =
-      glfwGetPrimaryMonitor();  // The primary monitor.. Later Occulus?..
+  GLFWmonitor* MyMonitor = glfwGetPrimaryMonitor();  // The primary monitor.. Later Occulus?..
 
   const GLFWvidmode* mode = glfwGetVideoMode(MyMonitor);
   width = mode->width;
@@ -59,6 +58,8 @@ bool Visualizer::windowInit() {
     std::cout << "Failed to initialize OpenGL context" << std::endl;
     return -1;
   }
+
+  glfwIconifyWindow(window);
 
   return 1;
 }
